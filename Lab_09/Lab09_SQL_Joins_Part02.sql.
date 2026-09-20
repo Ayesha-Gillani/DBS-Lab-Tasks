@@ -1,0 +1,209 @@
+-- ============================================================
+-- DATABASE SYSTEMS
+-- LAB 09 - SQL JOINS
+-- PART 02
+-- SELF JOIN, MULTI-TABLE JOINS, COMBINED CHALLENGES
+-- ============================================================
+
+USE joins_lab;
+
+
+-- ============================================================
+-- TASK B1
+-- For each employee, show their name and manager's name.
+-- Top-level managers should still appear with NULL Manager.
+-- SELF JOIN
+-- ============================================================
+
+SELECT
+    e.EmpName AS Employee,
+    m.EmpName AS Manager
+FROM Employee e
+LEFT JOIN Employee m
+    ON e.ManagerID = m.EmpID
+ORDER BY e.EmpID;
+
+
+-- ============================================================
+-- TASK B2
+-- List employees who earn more than their direct manager.
+-- Show employee name, employee salary, manager name,
+-- and manager salary.
+-- ============================================================
+
+SELECT
+    e.EmpName AS Employee,
+    e.Salary AS EmployeeSalary,
+    m.EmpName AS Manager,
+    m.Salary AS ManagerSalary
+FROM Employee e
+INNER JOIN Employee m
+    ON e.ManagerID = m.EmpID
+WHERE e.Salary > m.Salary
+ORDER BY e.Salary DESC;
+
+
+-- ============================================================
+-- TASK B3
+-- List employees whose manager works in a different department.
+-- Show employee name, manager name, and both department names.
+-- ============================================================
+
+SELECT
+    e.EmpName AS Employee,
+    m.EmpName AS Manager,
+    d1.DeptName AS EmployeeDepartment,
+    d2.DeptName AS ManagerDepartment
+FROM Employee e
+INNER JOIN Employee m
+    ON e.ManagerID = m.EmpID
+INNER JOIN Department d1
+    ON e.DeptID = d1.DeptID
+INNER JOIN Department d2
+    ON m.DeptID = d2.DeptID
+WHERE e.DeptID <> m.DeptID
+ORDER BY e.EmpName;
+
+
+-- ============================================================
+-- TASK B4
+-- Show every employee with the project name they work on
+-- and weekly hours.
+-- 3-TABLE JOIN
+-- Employee -> Assignment -> Project
+-- ============================================================
+
+SELECT
+    e.EmpID,
+    e.EmpName,
+    p.ProjectName,
+    a.HoursPerWeek
+FROM Employee e
+INNER JOIN Assignment a
+    ON e.EmpID = a.EmpID
+INNER JOIN Project p
+    ON a.ProjectID = p.ProjectID
+ORDER BY e.EmpName, p.ProjectName;
+
+
+-- ============================================================
+-- TASK B5
+-- List every assignment with employee name,
+-- project name, and project's department name.
+-- 4-TABLE JOIN
+-- ============================================================
+
+SELECT
+    e.EmpName,
+    p.ProjectName,
+    d.DeptName,
+    a.HoursPerWeek
+FROM Employee e
+INNER JOIN Assignment a
+    ON e.EmpID = a.EmpID
+INNER JOIN Project p
+    ON a.ProjectID = p.ProjectID
+LEFT JOIN Department d
+    ON p.DeptID = d.DeptID
+ORDER BY e.EmpName, p.ProjectName;
+
+
+-- ============================================================
+-- TASK B6
+-- List names and weekly hours of employees working
+-- on the Mobile App project.
+-- ============================================================
+
+SELECT
+    e.EmpName,
+    a.HoursPerWeek
+FROM Employee e
+INNER JOIN Assignment a
+    ON e.EmpID = a.EmpID
+INNER JOIN Project p
+    ON a.ProjectID = p.ProjectID
+WHERE p.ProjectName = 'Mobile App'
+ORDER BY e.EmpName;
+
+
+-- ============================================================
+-- TASK B7
+-- List every employee in Lahore together with the projects
+-- they are assigned to.
+-- Include Lahore employees with no assignments.
+-- ============================================================
+
+SELECT
+    e.EmpName,
+    p.ProjectName,
+    a.HoursPerWeek
+FROM Employee e
+LEFT JOIN Assignment a
+    ON e.EmpID = a.EmpID
+LEFT JOIN Project p
+    ON a.ProjectID = p.ProjectID
+WHERE e.City = 'Lahore'
+ORDER BY e.EmpName, p.ProjectName;
+
+
+-- ============================================================
+-- TASK B8
+-- List names of employees who work on a project
+-- run by a department different from their own.
+-- ============================================================
+
+SELECT DISTINCT
+    e.EmpName
+FROM Employee e
+INNER JOIN Assignment a
+    ON e.EmpID = a.EmpID
+INNER JOIN Project p
+    ON a.ProjectID = p.ProjectID
+WHERE p.DeptID IS NOT NULL
+  AND e.DeptID <> p.DeptID
+ORDER BY e.EmpName;
+
+
+-- ============================================================
+-- TASK B9
+-- For each department, list names of projects that started
+-- in 2024. Include departments that have no such projects.
+-- LEFT JOIN + date condition
+-- ============================================================
+
+SELECT
+    d.DeptID,
+    d.DeptName,
+    p.ProjectName,
+    p.StartDate
+FROM Department d
+LEFT JOIN Project p
+    ON d.DeptID = p.DeptID
+   AND p.StartDate >= '2024-01-01'
+   AND p.StartDate < '2025-01-01'
+ORDER BY d.DeptID, p.StartDate;
+
+
+-- ============================================================
+-- TASK B10
+-- For each employee, show total hours worked per week
+-- across all projects.
+-- Include employees with zero hours.
+-- ============================================================
+
+SELECT
+    e.EmpID,
+    e.EmpName,
+    COALESCE(SUM(a.HoursPerWeek), 0) AS TotalHoursPerWeek
+FROM Employee e
+LEFT JOIN Assignment a
+    ON e.EmpID = a.EmpID
+GROUP BY
+    e.EmpID,
+    e.EmpName
+ORDER BY e.EmpID;
+
+
+-- ============================================================
+-- END OF LAB 09
+-- ============================================================
