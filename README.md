@@ -35,21 +35,6 @@ Lab Organization
 
 The work is organized into separate folders/files according to the lab number.
 
-Database-Systems/
-│
-├── Lab-01/
-├── Lab-02/
-├── Lab-03/
-├── Lab-04/
-├── Lab-05/
-├── Lab-06/
-├── Lab-07/
-├── Lab-08/
-├── Lab-09/
-├── Lab-10/
-├── Lab-11/
-└── README.md
-
 Each lab contains the SQL code and other relevant work required for that particular practical.
 
 Tools & Technologies
